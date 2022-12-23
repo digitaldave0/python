@@ -1,5 +1,0 @@
-azure==4.0.0
-azure-mgmt-resource
-azure-mgmt-compute
-azure-mgmt-network
-azure-identity
