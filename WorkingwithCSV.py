@@ -4,11 +4,10 @@ from prettytable import PrettyTable
 def search_location(file_path, location):
     results = []
     with open(file_path, mode='r') as myfile:
-        data = csv.DictReader(myfile, delimiter=";")
+        data = csv.DictReader(myfile, delimiter=",")
         for row in data:
             if row['Location'] == location:
-                results.append({'Username': row['Username'], 'Location'
-: row['Location']})
+                results.append({'Username': row['Username'], 'Location': row['Location']})
     if not results:
         return "No results found for location: " + location
     else:
