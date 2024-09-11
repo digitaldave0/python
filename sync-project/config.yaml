@@ -1,0 +1,64 @@
+version: 2.1
+
+executors:
+  python-executor:
+    docker:
+      - image: circleci/python:3.8
+    working_directory: ~/repo
+
+jobs:
+  dump_ssm_parameters:
+    executor: python-executor
+    steps:
+      - checkout  # Checkout the repository
+      - run:
+          name: Install AWS CLI and Boto3
+          command: |
+            pip install awscli boto3
+      - run:
+          name: Dump SSM Parameters
+          command: |
+            python dump_ssm_parameters.py
+
+  dump_ecs_task_definitions:
+    executor: python-executor
+    steps:
+      - checkout  # Checkout the repository
+      - run:
+          name: Install AWS CLI and Boto3
+          command: |
+            pip install awscli boto3
+      - run:
+          name: Dump ECS Task Definitions
+          command: |
+            python dump_ecs_task_definitions.py
+
+  terraform_apply:
+    docker:
+      - image: hashicorp/terraform:latest
+    steps:
+      - checkout  # Checkout the repository
+      - run:
+          name: Install Terraform
+          command: |
+            terraform --version
+      - run:
+          name: Initialize Terraform
+          command: |
+            terraform init
+      - run:
+          name: Apply Terraform Configuration
+          command: |
+            terraform plan
+            terraform apply -auto-approve
+
+workflows:
+  version: 2
+  deploy:
+    jobs:
+      - dump_ssm_parameters
+      - dump_ecs_task_definitions
+      - terraform_apply:
+          requires:
+            - dump_ssm_parameters
+            - dump_ecs_task_definitions
